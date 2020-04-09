@@ -13,7 +13,7 @@ using namespace std;
 #include<math.h>
 #include<random>
 float operations(int op, float a, float b, float c, int d, char* str);
-//double activation(double x) {
+//float activation(float x) {
 //    return 1 / (1 + exp(-x));
 //}
 // Байт-код для обучения сети
@@ -34,19 +34,19 @@ typedef enum {
 	DEBUG_STR
 } OPS;
 // Логическое ИЛИИ
-double data[4][2] = {
+float data[4][2] = {
 	{0, 0},
 	{1, 0},
 	{0, 1},
 	{1, 1}
 };
-double answer[4] = {0, 1, 1, 1};
-double n1[2] = {0, 0};
-double n2 = 0;
-double w2[3] = {0, 0, 0};
-double n2_dot = 0; // взвешенное состояние нейрона(в больших сетях нейронов)
+float answer[4] = {0, 1, 1, 1};
+float n1[2] = {0, 0};
+float n2 = 0;
+float w2[3] = {0, 0, 0};
+float n2_dot = 0; // взвешенное состояние нейрона(в больших сетях нейронов)
 int count = 0;
-double A = 7, E, E1, E2, E3;
+float A = 0.07, E, E1, E2, E3;
 
 default_random_engine eng{static_cast<long unsigned int> (42)};
 normal_distribution<float> d{0, 1};
@@ -57,13 +57,13 @@ float get_norm_val(){
 int main() {
 	int choose = 0;
 	int eps = 10;
-	double mse = 0;
+	float mse = 0;
 	// b - верхняя граница, a - нижняя граница	
 	w2[0] = operations(INIT_W_HE, 2, 0, 0, 0, ""); // биас
 	w2[1] = operations(INIT_W_HE, 2, 0, 0, 0, ""); // случайные веса от 
 	w2[2] = operations(INIT_W_HE, 2, 0, 0, 0, "");
 	
-	//	double q = 0.0; // правильные ответы
+	//	float q = 0.0; // правильные ответы
 	/*while (count < eps)*/ while (1) {
 		printf("epocha %d\n", count);
 		//		choose = rand() % 3; // случайно выбираю входные данные
@@ -74,21 +74,21 @@ int main() {
 			n1[1] = data[choose][1]; // нейронах 1 слоя
 			/*Умножаю значения нейронов 1 слоя с соответствующими весами и
 			  пропускаю через функцию активации которая является сигмоидом*/
-			n2_dot = n1[0] * w2[0] + n1[1] * w2[2] + w2[0];
+			n2_dot = w2[0] + n1[0] * w2[1] + n1[1] * w2[2] ;
 			n2 = operations(RELU, n2_dot, 0, 0, 0, "");
 			// Получаю ошибку выходного нейрона
 			E = (answer[choose] - n2) * operations(RELU_DERIV, n2_dot, 0, 0, 0, "");
 			mse = pow(answer[choose] - n2, 2);
 			printf("mse in train: %f\n", mse);
-			if (mse < 0.00000100)
+			if (mse < 0.0001)
 				goto out_bach;
 			E1 = E * w2[0];
 			E2 = E * w2[1];
 			E3 = E * w2[2];
 			// изменяю веса
 			w2[0] = w2[0] + A * E1 * (+1);
-			w2[1] = w2[1] + A * E2 * n1[1];
-			w2[2] = w2[2] + A * E3 * n1[2];
+			w2[1] = w2[1] + A * E2 * n1[0];
+			w2[2] = w2[2] + A * E3 * n1[1];
 			
 			choose++;
 		}
@@ -179,7 +179,7 @@ float operations(int op, float a, float b, float c, int d, char* str) {
 		// Лучше использовать Гауссовое распределение,я его из Python получил
 	case INIT_W_HE:
 	{
-	return get_norm_val() * sqrt(2 / a);	
+	return get_norm_val() * sqrt(2 / a) * 0.05;	
 	}
 		//		PyObject * pVal;
 		//		float r = 0;
