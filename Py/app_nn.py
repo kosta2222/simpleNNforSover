@@ -2,7 +2,8 @@ from operations_func import operations
 from nn_constants import  INIT_W_HE, RELU,RELU_DERIV
 def main():
     data=[[0,0],[1,0],[0,1],[1,1]]
-    answer=[0,1,1,1]
+    # answer=[0,1,1,1]  #  OR
+    answer=[0, 0, 0, 1]  # AND
     n1=[0]*2
     n2=0
     w2=[0]*3
@@ -17,6 +18,10 @@ def main():
     eps=10
     mse=0
     exit_flag=False
+    scores=[]
+    theme=""
+    # theme="OR"
+    theme="AND"
 
 
     w2[0] = operations(INIT_W_HE, 2, 0, 0, 0, ""); # биас
@@ -62,32 +67,39 @@ def main():
         if exit_flag:
             break
 
-
-
     """
     Сеть
     обучилась - проведем
     консольную
     кросс - валидацию
     """
-    print("***Cons Cv - Logic Or***\n");
+    print("***Cons Cv - %s***\n" % theme);
     choose = 0;
     while (choose <= 3):
         print("chose %d\n" % choose);
-        n1[0] = data[choose][0]; # поставляю входные данные в
-        n1[1] = data[choose][1]; # нейронах 1 слоя
+        n1[0] = data[choose][0];  # поставляю входные данные в
+        n1[1] = data[choose][1];  # нейронах 1 слоя
         """
         / * Умножаю значения нейронов 1 слоя с соответствующими весами и
         пропускаю через функцию активации которая является сигмоидом * /
         """
         n2_dot = n1[0] * w2[0] + n1[1] * w2[2] + w2[0];
         n2 = operations(RELU, n2_dot, 0.5, 0, 0, "");
-        print("input vector [ %f %f ] "%( n1[0], n1[1]));
+        print("input vector [ %f %f ] " % (n1[0], n1[1]));
         if (n2 > 0.5):
-           print("output vector[ %f ] " % 1);
+            n2 = 1
+            print("output vector[ %f ] " % 1, end=' ')
         else:
-           print("output vector[ %f ] " % 0);
-        print("expected [ %f ]\n"% answer[choose]);
-        choose+=1;
+            n2 = 0
+            print("output vector[ %f ] " % 0, end=' ');
+        print("expected [ %f ]\n" % answer[choose]);
+        if n2 == answer[choose]:
+            scores.append(1)
+        else:
+            scores.append(0)
+
+        choose += 1;
+    acc = sum(scores) / 4 * 100
+    print("Accuracy", acc)
 
 main()
