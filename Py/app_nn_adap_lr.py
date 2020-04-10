@@ -2,8 +2,8 @@ from operations_func import operations
 from nn_constants import  INIT_W_HE, RELU,RELU_DERIV
 def main():
     data=[[0,0],[1,0],[0,1],[1,1]]
-    # answer=[0, 1, 1, 1]  #  OR
-    answer=[0, 0, 0, 1]  # AND
+    answer=[0, 1, 1, 1]  #  OR
+    # answer=[0, 0, 0, 1]  # AND
     n1=[0]*2
     n2=0
     w2=[0]*3
@@ -21,8 +21,8 @@ def main():
     exit_flag=False
     scores=[]
     theme=""
-    theme="AND"
-    # theme="OR"
+    # theme="AND"
+    theme="OR"
     alpha=0.99
     beta=1.01
     gama=1.01
@@ -31,11 +31,9 @@ def main():
     Z_t_minus_1=0
     A_t_minus_1=0
     acc=0
-    n2_dot=0
-
 
     w2[0] = operations(INIT_W_HE, 2, 0, 0, 0, ""); # биас
-    w2[1] = operations(INIT_W_HE, 2, 0, 0, 0, ""); # случайные
+    w2[1] = operations(INIT_W_HE, 2, 0, 0, 0, "");
     w2[2] = operations(INIT_W_HE, 2, 0, 0, 0, "");
 
     while (1) :
@@ -93,7 +91,7 @@ def main():
                 / * Умножаю значения нейронов 1 слоя с соответствующими весами и
                 пропускаю через функцию активации которая является сигмоидом * /
                 """
-                n2_dot = n1[0] * w2[0] + n1[1] * w2[2] + w2[0];
+                n2_dot = w2[0] + n1[0] * w2[1] + n1[1] * w2[2] ;
                 n2 = operations(RELU, n2_dot, 0.5, 0, 0, "");
                 print("input vector [ %f %f ] " % (n1[0], n1[1]));
                 if (n2 > 0.5):
