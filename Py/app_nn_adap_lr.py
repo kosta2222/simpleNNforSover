@@ -1,9 +1,9 @@
 from operations_func import operations
-from nn_constants import  INIT_W_HE, RELU,RELU_DERIV
+from nn_constants import  INIT_W_HE, RELU,RELU_DERIV, INIT_W_HABR, INIT_W_MY, SIGMOID, SIGMOID_DERIV
 def main():
     data=[[0,0],[1,0],[0,1],[1,1]]
-    answer=[0, 1, 1, 1]  #  OR
-    # answer=[0, 0, 0, 1]  # AND
+    # answer=[0, 1, 1, 1]  #  OR
+    answer=[0, 0, 0, 1]  # AND
     n1=[0]*2
     n2=0
     w2=[0]*3
@@ -21,8 +21,8 @@ def main():
     exit_flag=False
     scores=[]
     theme=""
-    # theme="AND"
-    theme="OR"
+    theme="AND"
+    # theme="OR"
     alpha=0.99
     beta=1.01
     gama=1.01
@@ -31,10 +31,13 @@ def main():
     Z_t_minus_1=0
     A_t_minus_1=0
     acc=0
+    sigmoid_koef=0.42
+    accuracy_shureness = 100
+    with_adap_lr = False
 
     w2[0] = operations(INIT_W_HE, 2, 0, 0, 0, ""); # биас
     w2[1] = operations(INIT_W_HE, 2, 0, 0, 0, "");
-    w2[2] = operations(INIT_W_HE, 2, 0, 0, 0, "");
+    w2[2] = operations(INIT_W_MY, 2, 0, 0, 0, "");
 
     while (1) :
         print("epocha %d\n" % count);
@@ -51,10 +54,10 @@ def main():
             пропускаю через функцию активации которая является сигмоидом 
             """
             n2_dot = w2[0] + n1[0] * w2[1] + n1[1] * w2[2]
-            n2 = operations(RELU, n2_dot, 0, 0, 0, "")
+            n2 = operations(SIGMOID, n2_dot, sigmoid_koef, 0, 0, "")
             # Получаю ошибку выходного нейрона
             Z = n2 - answer[choose]
-            E = (answer[choose] - n2) * operations(RELU_DERIV, n2_dot, 0, 0, 0, "");
+            E = (answer[choose] - n2) * operations(SIGMOID_DERIV, n2_dot, sigmoid_koef, 0, 0, "");
             if count == 0:
                 Z_t_minus_1 = Z
                 A_t_minus_1 = A
@@ -64,13 +67,13 @@ def main():
             #     print("op")
             #     exit_flag=True
             #     break
-
-            delta_E_spec = Z - gama * Z_t_minus_1
-            if delta_E_spec > 0:
-                A = alpha * A_t_minus_1
-            else:
-                A = beta * A_t_minus_1
-            print("A",A)
+            if with_adap_lr:
+                delta_E_spec = Z - gama * Z_t_minus_1
+                if delta_E_spec > 0:
+                    A = alpha * A_t_minus_1
+                else:
+                    A = beta * A_t_minus_1
+                print("A",A)
             A_t_minus_1 = A
             Z_t_minus_1 = Z
 
@@ -92,7 +95,7 @@ def main():
                 пропускаю через функцию активации которая является сигмоидом * /
                 """
                 n2_dot = w2[0] + n1[0] * w2[1] + n1[1] * w2[2] ;
-                n2 = operations(RELU, n2_dot, 0.5, 0, 0, "");
+                n2 = operations(SIGMOID, n2_dot, sigmoid_koef, 0, 0, "");
                 print("input vector [ %f %f ] " % (n1[0], n1[1]));
                 if (n2 > 0.5):
                     n2 = 1
@@ -110,7 +113,7 @@ def main():
             acc = sum(scores) / 4 * 100
             print("Accuracy statement",acc)
             scores.clear()
-            if acc == 75.0:
+            if acc == accuracy_shureness:
                 exit_flag = True
                 break
 
@@ -138,7 +141,7 @@ def main():
         пропускаю через функцию активации которая является сигмоидом * /
         """
         n2_dot = w2[0] + n1[0] * w2[1] + n1[1] * w2[2] ;
-        n2 = operations(RELU, n2_dot, 0, 0, 0, "");
+        n2 = operations(SIGMOID, n2_dot, sigmoid_koef, 0, 0, "");
         print("input vector [ %f %f ] " % (n1[0], n1[1]));
         if (n2 > 0.5):
             n2 = 1
